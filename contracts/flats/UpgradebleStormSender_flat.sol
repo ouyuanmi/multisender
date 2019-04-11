@@ -281,7 +281,7 @@ contract ERC20 is ERC20Basic {
 }
 
 
-contract UpgradebleStormSender is OwnedUpgradeabilityStorage, Claimable {
+contract UpgradebleStormSender2019_v4 is OwnedUpgradeabilityStorage, Claimable {
     using SafeMath for uint256;
 
     event Multisended(uint256 total, address tokenAddress);
@@ -301,7 +301,7 @@ contract UpgradebleStormSender is OwnedUpgradeabilityStorage, Claimable {
         setOwner(_owner);
         setArrayLimit(200);
         setDiscountStep(0.00005 ether);
-        setFee(0.05 ether);
+        setFee(0.0001 ether);
         boolStorage[keccak256("rs_multisender_initialized")] = true;
     }
 
@@ -314,7 +314,7 @@ contract UpgradebleStormSender is OwnedUpgradeabilityStorage, Claimable {
     }
 
     function arrayLimit() public view returns(uint256) {
-        return uintStorage[keccak256(abi.encodePacked("arrayLimit"))];
+        return uintStorage[keccak256("arrayLimit")];
     }
 
     function setArrayLimit(uint256 _newLimit) public onlyOwner {
@@ -336,7 +336,7 @@ contract UpgradebleStormSender is OwnedUpgradeabilityStorage, Claimable {
     }
 
     function currentFee(address _customer) public view returns(uint256) {
-        if (fee() > discountRate(msg.sender)) {
+        if (fee() >= discountRate(msg.sender)) {
             return fee().sub(discountRate(_customer));
         } else {
             return 0;
