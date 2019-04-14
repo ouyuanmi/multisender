@@ -314,7 +314,7 @@ contract UpgradebleStormSender2019_v4 is OwnedUpgradeabilityStorage, Claimable {
     }
 
     function arrayLimit() public view returns(uint256) {
-        return uintStorage[keccak256("arrayLimit")];
+        return uintStorage[keccak256(abi.encodePacked("arrayLimit"))];
     }
 
     function setArrayLimit(uint256 _newLimit) public onlyOwner {
@@ -336,7 +336,7 @@ contract UpgradebleStormSender2019_v4 is OwnedUpgradeabilityStorage, Claimable {
     }
 
     function currentFee(address _customer) public view returns(uint256) {
-        if (fee() >= discountRate(msg.sender)) {
+        if (fee() > discountRate(msg.sender)) {
             return fee().sub(discountRate(_customer));
         } else {
             return 0;
