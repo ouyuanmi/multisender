@@ -29,14 +29,14 @@
     "sweetalert": "^2.1.0",
     "web3": "^1.0.0-beta.30"
   },
-	"scripts": {
-		"build-css": "node-sass-chokidar src/assets/stylesheets/application.scss -o src/assets/stylesheets --output-style=compressed",
-		"watch-css": "nodemon -e scss -x \"npm run build-css\"",
-		"start": "react-app-rewired start --reset-cache",
-		"build": "react-app-rewired build",
-		"test": "react-app-rewired test --env=jsdom",
-		"eject": "react-app-rewired eject",
-		"predeploy": "npm run build",
-		"deploy": "gh-pages -d build -o rstorm"
-	}
+  "scripts": {
+    "build-css": "node-sass-chokidar src/assets/stylesheets/application.scss -o src/assets/stylesheets --output-style=compressed",
+    "watch-css": "nodemon -e scss -x \"npm run build-css\"",
+    "start": "react-app-rewired start --reset-cache",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom",
+    "eject": "react-app-rewired eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build -o rstorm"
+  }
 }
