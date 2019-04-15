@@ -40,6 +40,16 @@ export class ThirdStep extends React.Component {
       })
       return
     }
+    //TODO
+    if( new BN(this.tokenStore.totalCostInEth).gt(new BN(this.tokenStore.ethBalance))){
+      console.error('please fund you account in ')
+      swal({
+        title: "Insufficient ETH balance",
+        text: `You don't have enough ETH to send to all addresses. Amount needed: ${this.tokenStore.totalCostInEth} ETH`,
+        icon: "error",
+      })
+      return
+    }
     if( new BN(this.tokenStore.totalCostInEth).gt(new BN(this.tokenStore.ethBalance))){
       console.error('please fund you account in ')
       swal({

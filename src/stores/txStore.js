@@ -5,6 +5,7 @@ import MultiSenderAbi from "../abis/StormMultisender"
 import Web3 from "web3";
 import { observer } from "mobx-react";
 import swal from 'sweetalert';
+
 const BN = require('bignumber.js');
 
 
@@ -33,25 +34,77 @@ class TxStore {
     this.keepRunning = true;
     this.txs = [];
     this.approval = '';
+    const LUDtokenSymbol = 'LUD';
     if(new BN(this.tokenStore.totalBalance).gt(new BN(this.tokenStore.allowance))){
-      this._approve();
-      const interval = setInterval(() => {
-        const index = this.txHashToIndex[this.approval];
-        console.log('checking autorun', index, this.approval, this.txHashToIndex, toJS(this.txs))
-        if(this.approval){
-          if(this.txs[index] && this.txs[index].status === 'mined'){
-            clearInterval(interval);
-            console.log('lets GO!', this.tokenStore.totalNumberTx, this.tokenStore.arrayLimit)
-            setTimeout(() => {
-              this._multisend({slice: this.tokenStore.totalNumberTx, addPerTx: this.tokenStore.arrayLimit})
-            }, 1000)
+      if (BN(this.tokenStore.allowance).comparedTo(0) == 1 && LUDtokenSymbol == this.tokenStore.tokenSymbol){
+        this._approveZero().then( ()=> {
+          console.log('then in _approveZero @33');
+          this.approval = '';
+          this._approve();
+          console.log('_approveZero @44');
+          const interval = setInterval(()=>{
+            console.log('_approveZero @55');
+            const index = this.txHashToIndex[this.approval];
+            console.log('checking autorun', index, this.approval, this.txHashToIndex, toJS(this.txs))
+            if(this.approval){
+              if(this.txs[index] && this.txs[index].status === 'mined'){
+                clearInterval(interval);
+                console.log('lets GO!', this.tokenStore.totalNumberTx, this.tokenStore.arrayLimit)
+                setTimeout(() => {
+                  this._multisend({slice: this.tokenStore.totalNumberTx, addPerTx: this.tokenStore.arrayLimit})
+                }, 1000)
+              }
+            }
+          }, 3000)
+          this.interval = interval;
+        });
+      }else{
+        this._approve();
+        const interval = setInterval(() =>{
+          console.log('_approve @66');
+          const index = this.txHashToIndex[this.approval];
+          console.log('checking autorun', index, this.approval, this.txHashToIndex, toJS(this.txs))
+          if(this.approval){
+            if(this.txs[index] && this.txs[index].status === 'mined'){
+              clearInterval(interval);
+              console.log('lets GO!', this.tokenStore.totalNumberTx, this.tokenStore.arrayLimit)
+              setTimeout(() => {
+                this._multisend({slice: this.tokenStore.totalNumberTx, addPerTx: this.tokenStore.arrayLimit})
+              }, 1000)
+            }
           }
-        }
-      }, 3000)
-      this.interval = interval;
+        }, 3000);
+        
+        this.interval = interval;
+      }
     } else {
       this._multisend({slice: this.tokenStore.totalNumberTx, addPerTx: this.tokenStore.arrayLimit})
     }
+  }
+
+  async _approveZero(){
+    const index = this.txs.length;
+    const web3 = this.web3Store.web3;
+    const token = new web3.eth.Contract(ERC20ABI, this.tokenStore.tokenAddress);
+    try{
+      console.log('_approveZero @11')
+       var fx = await token.methods['approve(address,uint256)'](this.tokenStore.proxyMultiSenderAddress, Number(0))
+      .send({from: this.web3Store.defaultAccount, gasPrice: this.gasPriceStore.standardInHex})
+      .on('transactionHash', (hash) => {
+        this.approval = hash
+        this.txHashToIndex[hash] = index;
+        this.txs[index] = {status: 'pending', name: `MultiSender Approval to spend 0 ${this.tokenStore.tokenSymbol}`, hash}
+        this.getTxStatus(hash)  
+      })
+      .on('error', (error) => {
+        swal("Error!", error.message, 'error')
+        console.error(error)
+      });      
+      console.log('_approveZero @22')
+      return fx;
+    } catch (e){
+      console.error(e)
+    }  
   }
 
   async _approve(){

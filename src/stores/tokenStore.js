@@ -1,8 +1,9 @@
 import { action, observable, computed } from "mobx";
-import ERC20ABI from '../abis/ERC20ABI'
-import StormMultiSenderABI from '../abis/StormMultisender'
+import ERC20_ABI from '../abis/ERC20ABI'
+import MultiSenderABI from '../abis/StormMultisender'
 import Web3Utils from 'web3-utils';
-
+const ERC20ABI = ERC20_ABI;
+const StormMultiSenderABI = MultiSenderABI;
 const BN = require('bignumber.js');
 function add(a, b) {
   return new BN(a).plus(new BN(b));
@@ -134,8 +135,11 @@ class TokenStore {
       if(Web3Utils.isAddress(this.web3Store.defaultAccount) && tokenAddress !== "0x000000000000000000000000000000000000bEEF"){
         this.tokenAddress = tokenAddress;
         await this.getDecimals(tokenAddress)
+        console.log('tokenAddress Done')
         await this.getBalance()
+        console.log('getBalance Done')
         await this.getAllowance()
+        console.log('getAllowance Done')
         await this.getCurrentFee()
         this.getTokenSymbol(tokenAddress)
         this.getEthBalance()
