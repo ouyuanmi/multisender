@@ -1,2 +1,5 @@
 .env
 build
+node_modules
+200.txt
+190000-200000.xlsx
