@@ -5,7 +5,7 @@
   "homepage": "https://rstormsf.github.io/multisender",
   "engines": {
     "node": "10.15.3"
-  }
+  },
   "dependencies": {
     "bignumber.js": "^6.0.0",
     "csvtojson": "^1.1.9",
